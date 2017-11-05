@@ -1,0 +1,3 @@
+{"type": "name", "name": "glyph"}
+{"type": "join", "channel": "testing"}
+{"type": "speak", "channel": "testing", "message": "hello", "id": "1"}

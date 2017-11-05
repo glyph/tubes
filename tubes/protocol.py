@@ -94,6 +94,10 @@ class _TransportDrain(object):
         self._transport = transport
 
 
+    def __repr__(self):
+        return 'TransportDrain({!r})'.format(self._transport)
+
+
     def flowingFrom(self, fount):
         """
         Data is flowing to this transport from the given fount.  Register that
@@ -159,8 +163,13 @@ class _TransportFount(object):
 
     def __init__(self, transport):
         self._transport = transport
-        self._pauser = Pauser(self._transport.pauseProducing,
-                              self._transport.resumeProducing)
+        def doPauseTransport():
+            print("pausing", self._transport)
+            self._transport.pauseProducing()
+        def doResumeTransport():
+            print("resuming", self._transport)
+            self._transport.resumeProducing()
+        self._pauser = Pauser(doPauseTransport, doResumeTransport)
         self._preReceivePause = None
         self._preReceiveBuffer = None
 

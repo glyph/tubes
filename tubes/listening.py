@@ -34,6 +34,12 @@ class Flow(object):
         self.fount = fount
         self.drain = drain
 
+    def __repr__(self):
+        """
+        
+        """
+        return 'Flow({!r}, {!r})'.format(self.fount, self.drain)
+
 
 
 @implementer(IDrain)
@@ -112,6 +118,14 @@ class _OnStop(object):
         Call the given callback.
         """
         self.callback = callback
+
+
+    def __repr__(self):
+        """
+        
+        """
+        return 'OnStop({})'.format(repr(self.callback))
+
 
 
     def received(self, item):

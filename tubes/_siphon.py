@@ -190,7 +190,10 @@ class _SiphonFount(_SiphonPiece):
         """
         Nice string representation.
         """
-        return "<Fount for {0}>".format(repr(self._siphon._tube))
+        drainingTo = ("" if self.drain is None
+                      else "draining to " + repr(self.drain))
+        return "<Fount for {0}{1}>".format(repr(self._siphon._tube),
+                                           drainingTo)
 
 
     @property

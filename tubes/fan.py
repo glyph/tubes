@@ -189,6 +189,7 @@ class _OutFount(object):
         self._receivedWhilePaused = []
         self._myPause = None
         self._stopper = stopper
+        self._hasStopped = False
 
         def actuallyPause():
             self._myPause = upstreamPauser.pause()
@@ -229,7 +230,9 @@ class _OutFount(object):
         """
         Invoke the callback supplied to C{__init__} for stopping.
         """
-        self._stopper(self)
+        if not self._hasStopped:
+            self._hasStopped = True
+            self._stopper(self)
 
 
     def _deliverOne(self, item):

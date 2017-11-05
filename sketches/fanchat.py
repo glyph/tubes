@@ -39,7 +39,13 @@ class Participant(object):
 
     def received(self, item):
         kwargs = item.copy()
-        return getattr(self, "do_" + kwargs.pop("type"))(**kwargs)
+        try:
+            return getattr(self, "do_" + kwargs.pop("type"))(**kwargs)
+        except:
+            print("OOPS")
+            tb = Failure().getTraceback()
+            print(tb)
+            return [to(self.client, dict(type="oops", f=tb))]
 
     def do_name(self, name):
         self.name = name
@@ -52,16 +58,29 @@ class Participant(object):
         yield to(self.client, dict(type="joined"))
 
     def do_join(self, channel):
+        yield to(self.client, dict(type="joining", channel=channel))
+        print("joining")
         fountFromChannel, drainToChannel = (
             self._hub.channelNamed(channel).participate(self)
         )
+        print("participated")
+        yield to(self.client, dict(type="participated", channel=channel))
         fountFromChannel.flowTo(self._in.newDrain())
+        print("participated_1")
+        yield to(self.client, dict(type="participated_1", channel=channel))
+        print("new route?")
         fountToChannel = self._router.newRoute()
+        print("participated_2")
+        # yield to(self.client, dict(type="participated_2", channel=channel))
         fountToChannel.flowTo(drainToChannel)
+        print("flowed")
+        # yield to(self.client, dict(type="flowed", channel=channel))
 
         self._participating[channel] = fountToChannel
+        # yield to(self.client, dict(type="participating", channel=channel))
         yield to(self._participating[channel],
                  dict(type="joined"))
+        yield to(self.client, dict(type="post-join", channel=channel))
 
     def do_speak(self, channel, message, id):
         yield to(self._participating[channel],
