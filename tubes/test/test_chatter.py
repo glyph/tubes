@@ -31,14 +31,18 @@ class Participant(object):
         self._in.fount.flowTo(responsesDrain)
 
         self._router = Router()
+        self.client = self._router.newRoute("client")
+        self.client.flowTo(self._in.newDrain())
         self._participating = {}
 
         # `self._in' is both commands from our own client and also messages
         # from other clients.
         requestsFount.flowTo(series(self, self._router.drain))
 
-        self.client = self._router.newRoute("client")
-        self.client.flowTo(self._in.newDrain())
+
+    def started(self):
+        # yield to(self.client, {"type": "started"})
+        return ()
 
 
     def received(self, item):
@@ -226,3 +230,10 @@ class ChatTests(TestCase):
         self.assertEqual(fd.received, [{"type": "joined",
                                         "sender": "bob",
                                         "channel": "bobs"}])
+        fd.received.pop()
+        ff.drain.receive({"type": "join", "channel": "bobs2"})
+        self.assertEqual(fd.received, [{"type": "joined",
+                                        "sender": "bob",
+                                        "channel": "bobs2"}])
+        self.assertEqual(False, ff.flowIsPaused)
+        self.assertEqual(False, ff.flowIsStopped)
