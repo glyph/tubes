@@ -6,6 +6,7 @@ from zope.interface.common.mapping import IMapping
 
 from twisted.internet.endpoints import serverFromString
 from twisted.internet.defer import Deferred, inlineCallbacks
+from twisted.python.failure import Failure
 
 from tubes.routing import Router, Routed, to
 from tubes.itube import IFrame
@@ -118,7 +119,7 @@ def linesToCommands(line):
 
 @receiver(IMapping, IFrame)
 def commandsToLines(message):
-    yield dumps(message)
+    yield dumps(message).encode("ascii")
 
 
 
