@@ -75,14 +75,18 @@ class Participant(object):
 
         @param channel: the name of the channel to join.
         """
+        print("TO:")
+        yield to(self.client, dict(type="joining", channel=channel))
         fountFromChannel, drainToChannel = (
             self._hub.channelNamed(channel).participate(self)
         )
-        fountFromChannel.flowTo(self._in.newDrain())
         fountToChannel = self._router.newRoute("->{}".format(channel))
+        # when we make this route,
+        # the upstreams of the router pause!
         fountToChannel.flowTo(drainToChannel)
 
         self._participating[channel] = fountToChannel
+        fountFromChannel.flowTo(self._in.newDrain())
         yield to(self._participating[channel],
                  dict(type="joined"))
 

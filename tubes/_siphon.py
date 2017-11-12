@@ -255,7 +255,9 @@ class _SiphonDrain(_SiphonPiece):
         """
         Nice string representation.
         """
-        return '<Drain for {0}>'.format(self._siphon._tube)
+        return '<Drain for {0} {1}>'.format(
+            self._siphon._tube, self._siphon._tfount.drain
+        )
 
 
     @property
@@ -284,8 +286,13 @@ class _SiphonDrain(_SiphonPiece):
                 pauseFlow = NoPause
             else:
                 pauseFlow = fount.pauseFlow
-            self._siphon._pauseBecausePauseCalled = pauseFlow()
+            pf = pauseFlow()
+            print("PF", fount)
+            assert self._siphon._pauseBecausePauseCalled is None
+            self._siphon._pauseBecausePauseCalled = pf
             pbpc.unpause()
+            print("RU", fount)
+            assert self._siphon._pauseBecausePauseCalled is pf
         if fount is not None:
             if not self._siphon._canStillProcessInput:
                 fount.stopFlow()
